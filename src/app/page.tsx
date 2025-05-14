@@ -1,103 +1,120 @@
-import Image from "next/image";
+"use client"
 
-export default function Home() {
+import { useEffect, useState } from "react"
+import { supabase } from '@/lib/supabase'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import 'swiper/css'
+import 'swiper/css/pagination'
+import { Pagination, Autoplay } from 'swiper/modules'
+import { FaUser, FaHeart, FaShoppingCart } from "react-icons/fa"
+
+type Product = {
+  id: number
+  name: string
+  description: string
+  price: number
+  created_at: string
+}
+
+function TopNoticeBar() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+    <div className="bg-purple-800 text-white text-center py-2 text-sm font-semibold">
+      지금 가입하고 <b>최대 1만원 할인 쿠폰</b> 받아가세요!
     </div>
-  );
+  )
+}
+
+function Header() {
+  return (
+    <header className="bg-white shadow flex flex-col items-center py-4 mb-4">
+      <div className="flex w-full max-w-6xl items-center justify-between">
+        <div className="flex items-center gap-8">
+          <span className="text-3xl font-extrabold text-purple-700 font-cursive">Kurly</span>
+          <nav className="hidden md:flex gap-6 text-lg font-semibold text-gray-700">
+            <a href="#">마켓컬리</a>
+            <a href="#">뷰티컬리</a>
+          </nav>
+        </div>
+        <div className="flex items-center gap-6 text-xl text-gray-700">
+          <a href="#"><FaUser /></a>
+          <a href="#"><FaHeart /></a>
+          <a href="#"><FaShoppingCart /></a>
+        </div>
+      </div>
+      <div className="w-full max-w-2xl mt-4">
+        <input
+          className="w-full border-2 border-purple-400 rounded-full px-6 py-2 focus:outline-none focus:border-purple-700 transition"
+          placeholder="검색어를 입력해주세요"
+        />
+      </div>
+      <div className="flex gap-8 mt-4 text-base font-semibold text-gray-700">
+        <a href="#">카테고리</a>
+        <a href="#">신상품</a>
+        <a href="#">베스트</a>
+        <a href="#">알뜰쇼핑</a>
+        <a href="#">특가/혜택</a>
+      </div>
+    </header>
+  )
+}
+
+export default function ShopPage() {
+  const [products, setProducts] = useState<Product[]>([])
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('id', { ascending: false })
+      if (error) setError(error.message)
+      else setProducts(data || [])
+    }
+    fetchProducts()
+  }, [])
+
+  if (error) {
+    return <div>상품을 불러오는 중 오류가 발생했습니다: {error}</div>
+  }
+
+  return (
+    <div className="bg-gray-50 min-h-screen">
+      <TopNoticeBar />
+      <Header />
+
+      <div className="max-w-6xl mx-auto">
+        <Swiper
+          modules={[Pagination, Autoplay]}
+          pagination={{ clickable: true }}
+          autoplay={{ delay: 3000, disableOnInteraction: false }}
+          loop
+          className="rounded-xl mb-8"
+        >
+          <SwiperSlide>
+            <img src="/banner1.jpg" alt="배너1" className="w-full h-64 object-cover rounded-xl" />
+          </SwiperSlide>
+          <SwiperSlide>
+            <img src="/banner2.jpg" alt="배너2" className="w-full h-64 object-cover rounded-xl" />
+          </SwiperSlide>
+          <SwiperSlide>
+            <img src="/banner3.jpg" alt="배너3" className="w-full h-64 object-cover rounded-xl" />
+          </SwiperSlide>
+        </Swiper>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">상품 목록</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.map((product) => (
+            <div key={product.id} className="border rounded-lg p-4 shadow-sm bg-white">
+              <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
+              <p className="text-gray-600 mb-2">{product.description}</p>
+              <p className="text-lg font-bold">{product.price.toLocaleString()}원</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
 }
